@@ -1,0 +1,31 @@
+# CodeDeploy agent logs are stored in /var/log/aws/codedeploy-agent/codedeploy-agent.log
+#                                     /opt/codedeploy-agent/deployment-root/deployment-logs/codedeploy-agent-deployments.log
+#                                     /opt/codedeploy-agent/deployment-root/<deployment-group-ID>/<deployment-ID>/logs/scripts.log
+#                                     
+version: 0.0
+os: linux
+files:
+  - source: simpleJavaWebApp-1.0-SNAPSHOT.war
+    destination: /opt/apache-tomcat-9.0.80/webapps
+file_exists_behavior: OVERWRITE
+#  ApplicationStop:
+#    - location: 
+#      timeout: 300
+#      runas:
+#  DownloadBundle – During this deployment lifecycle event, the CodeDeploy agent copies the application revision files to a temporary location:
+#    /opt/codedeploy-agent/deployment-root/deployment-group-id/deployment-id/deployment-archive
+#    This event is reserved for the CodeDeploy agent and cannot be used to run scripts.
+hooks:
+  BeforeInstall:
+    - location: shutdown.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: rename_wars.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: startup.sh
+      timeout: 300
+      runas: root
+
